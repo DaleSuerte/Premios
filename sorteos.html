@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+
+        #ticket {
+            width: 300px;
+            height: 150px;
+            background: url('ticket.png') no-repeat center center;
+            background-size: contain;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+            color: black;
+        }
+
+        #winners {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div id="ticket">250</div>
+
+    <div id="winners">
+        <h3>Winning Numbers</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Winning Number</th>
+                </tr>
+            </thead>
+            <tbody id="winnerList">
+                <!-- Winners will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const ticketElement = document.getElementById('ticket');
+        const winnerList = document.getElementById('winnerList');
+
+        let currentNumber = 250;
+        let interval;
+
+        function startAnimation() {
+            interval = setInterval(() => {
+                currentNumber = Math.floor(Math.random() * 250) + 1;
+                ticketElement.textContent = currentNumber;
+            }, 50); // Adjusted speed for faster animation
+        }
+
+        function stopAnimation() {
+            clearInterval(interval);
+
+            const now = new Date();
+            const date = now.toLocaleDateString();
+            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `<td>${date}</td><td>${time}</td><td>${currentNumber}</td>`;
+            winnerList.appendChild(newRow);
+        }
+
+        function scheduleStops() {
+            const stopTimes = ['10:00', '13:00', '16:00', '19:00'];
+
+            stopTimes.forEach(time => {
+                const [hour, minute] = time.split(':').map(Number);
+                const now = new Date();
+                const stopTime = new Date();
+
+                stopTime.setHours(hour, minute, 0, 0);
+
+                if (now > stopTime) {
+                    stopTime.setDate(stopTime.getDate() + 1);
+                }
+
+                const timeout = stopTime - now;
+                setTimeout(() => {
+                    stopAnimation();
+                    setTimeout(startAnimation, 20000); // Resume animation after 20 seconds
+                }, timeout);
+            });
+        }
+
+        startAnimation();
+        scheduleStops();
+    </script>
+</body>
+</html>
